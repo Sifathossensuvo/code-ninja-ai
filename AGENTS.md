@@ -8,3 +8,7 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Chat page IDs come from `/chat/$threadId`; browser-local thread records store complete AI SDK UIMessage parts to preserve conversation separation and history.
+- The AI streaming boundary is `/api/chat`, with provider configuration in server-only modules; no chat history is stored in Cloud.
+- Use AI Elements for the transcript, markdown, loading state and composer, with visual roles defined in the global design system.
