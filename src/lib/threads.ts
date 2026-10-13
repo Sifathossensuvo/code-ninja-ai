@@ -15,6 +15,12 @@ export function readThreads(): NinjaThread[] {
 export function writeThreads(threads: NinjaThread[]) {
   localStorage.setItem(KEY, JSON.stringify(threads));
 }
+export function deleteThread(id: string) {
+  writeThreads(readThreads().filter((thread) => thread.id !== id));
+}
+export function clearThreads() {
+  writeThreads([]);
+}
 export function createThread(id: string = crypto.randomUUID()): NinjaThread {
   const thread = { id, title: "New Session", updatedAt: Date.now(), messages: [] };
   const threads = readThreads();
