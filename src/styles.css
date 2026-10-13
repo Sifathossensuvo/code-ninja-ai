@@ -1550,3 +1550,26 @@
     opacity: 0.55;
   }
 }
+@media (min-width: 941px) and (max-width: 1250px) {
+  .system-panel:nth-child(4) {
+    overflow: hidden;
+  }
+  .system-panel:nth-child(4) h3 {
+    margin-bottom: 5px;
+  }
+  .system-panel:nth-child(4) .file-row {
+    height: 19px;
+    min-height: 19px;
+  }
+  .ninja-welcome {
+    padding-top: 0;
+  }
+  .welcome-mark {
+    width: 116px;
+    height: 116px;
+    margin-top: -5px;
+  }
+  .ninja-welcome h2 {
+    margin-top: 0;
+  }
+}

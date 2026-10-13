@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport, type UIMessage } from "ai";
+import { DefaultChatTransport } from "ai";
 import { motion } from "framer-motion";
 import {
   Home,
@@ -25,7 +25,6 @@ import {
   Crosshair,
   Copy,
   Download,
-  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -66,7 +65,7 @@ export function NinjaApp({ threadId }: { threadId?: string }) {
       void navigate({ to: "/chat/$threadId", params: { threadId: next.id }, replace: true });
     } else setThread(readThreads().find((t) => t.id === threadId) || createThread(threadId));
   }, [threadId, navigate]);
-  return <Workspace key={threadId || "home"} thread={thread} />;
+  return <Workspace key={thread?.id || "loading"} thread={thread} />;
 }
 function Workspace({ thread }: { thread: NinjaThread | null }) {
   const navigate = useNavigate();
