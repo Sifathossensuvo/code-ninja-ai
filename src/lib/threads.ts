@@ -6,7 +6,7 @@ export function readThreads(): NinjaThread[] {
   try { const value = JSON.parse(localStorage.getItem(KEY) || '[]'); return Array.isArray(value) ? value.filter(t => typeof t.id === 'string' && Array.isArray(t.messages)) : []; } catch { return []; }
 }
 export function writeThreads(threads: NinjaThread[]) { localStorage.setItem(KEY, JSON.stringify(threads)); }
-export function createThread(id = crypto.randomUUID()): NinjaThread {
+export function createThread(id: string = crypto.randomUUID()): NinjaThread {
   const thread = { id, title: 'New Session', updatedAt: Date.now(), messages: [] };
   const threads = readThreads();
   const existing = threads.find(t => t.id === id);
