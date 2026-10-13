@@ -25,8 +25,13 @@ import {
   Crosshair,
   Copy,
   Download,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 import {
   Conversation,
   ConversationContent,
@@ -42,7 +47,7 @@ import {
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { NinjaMark, Globe } from "./identity";
 import { RightPanels, actions, files } from "./panels";
-import { createThread, readThreads, saveMessages, type NinjaThread } from "@/lib/threads";
+import { clearThreads, createThread, deleteThread, readThreads, saveMessages, type NinjaThread } from "@/lib/threads";
 import floor from "@/assets/circuit-floor.jpg";
 const commands = [
   ["/chat", "Start a new conversation"],
@@ -63,7 +68,14 @@ export function NinjaApp({ threadId }: { threadId?: string }) {
     if (!threadId) {
       const next = readThreads()[0] || createThread();
       void navigate({ to: "/chat/$threadId", params: { threadId: next.id }, replace: true });
-    } else setThread(readThreads().find((t) => t.id === threadId) || createThread(threadId));
+    } else {
+      const existing = readThreads().find((t) => t.id === threadId);
+      if (existing) setThread(existing);
+      else {
+        const next = readThreads()[0] || createThread();
+        void navigate({ to: "/chat/$threadId", params: { threadId: next.id }, replace: true });
+      }
+    }
   }, [threadId, navigate]);
   return <Workspace key={thread?.id || "loading"} thread={thread} />;
 }
@@ -79,6 +91,7 @@ function Workspace({ thread }: { thread: NinjaThread | null }) {
   const [code, setCode] = useState(files[0]?.content || "");
   const [output, setOutput] = useState("");
   const [notice, setNotice] = useState("");
+  const [deletion, setDeletion] = useState<NinjaThread | "all" | null>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const { messages, sendMessage, status, stop, setMessages, error } = useChat({
@@ -112,6 +125,24 @@ function Workspace({ thread }: { thread: NinjaThread | null }) {
   const newChat = () => {
     const next = createThread();
     void navigate({ to: "/chat/$threadId", params: { threadId: next.id } });
+  };
+  const confirmDeletion = () => {
+    if (!deletion) return;
+    try {
+      const deletingCurrent = deletion === "all" || deletion.id === thread?.id;
+      if (deletingCurrent) stop();
+      if (deletion === "all") clearThreads();
+      else deleteThread(deletion.id);
+      const remaining = readThreads();
+      setThreads(remaining);
+      setDeletion(null);
+      if (deletingCurrent) {
+        const next = remaining[0] || createThread();
+        void navigate({ to: "/chat/$threadId", params: { threadId: next.id }, replace: true });
+      }
+    } catch {
+      setNotice("Could not delete this history. Please try again.");
+    }
   };
   const choosePrompt = (text: string) => {
     setView("Home");
@@ -193,13 +224,16 @@ function Workspace({ thread }: { thread: NinjaThread | null }) {
         <Button
           variant="ghost"
           size="icon-sm"
-          title="Toggle navigation"
+          title={mobileMenu ? "Close navigation" : "Toggle navigation"}
+          aria-label={mobileMenu ? "Close navigation" : "Toggle navigation"}
+          aria-expanded={mobileMenu}
           onClick={() => setMobileMenu(!mobileMenu)}
         >
-          <Menu />
+          {mobileMenu ? <X /> : <Menu />}
         </Button>
       </header>
       <div className="workspace-layout">
+        {mobileMenu && <div className="sidebar-backdrop" onClick={() => setMobileMenu(false)} aria-hidden="true" />}
         <aside className={`sidebar ${mobileMenu ? "sidebar-open" : ""}`}>
           <nav>
             {nav.map(({ label, icon: Icon, shortcut }) => (
@@ -229,16 +263,22 @@ function Workspace({ thread }: { thread: NinjaThread | null }) {
             ))}
           </nav>
           <div className="active-sessions">
-            <h3>ACTIVE SESSIONS</h3>
+            <div className="sessions-heading">
+              <h3>ACTIVE SESSIONS</h3>
+              <Button variant="ghost" size="icon-xs" title="Clear all history" aria-label="Clear all history" disabled={!threads.length} onClick={() => setDeletion("all")}><Trash2 /></Button>
+            </div>
             <div className="session-list">
               {threads.map((t) => (
-                <Button asChild key={t.id} variant="nav" className="session-row">
-                  <Link to="/chat/$threadId" params={{ threadId: t.id }}>
+                <div key={t.id} className="session-item">
+                <Button asChild variant="nav" className="session-row">
+                  <Link to="/chat/$threadId" params={{ threadId: t.id }} onClick={() => { setMobileMenu(false); setView("Home"); }}>
                     <i />
                     <span>{t.title}</span>
                     <small>{t.id === thread?.id ? "Just now" : "Saved"}</small>
                   </Link>
                 </Button>
+                <Button variant="ghost" size="icon-xs" className="delete-chat" title={`Delete ${t.title}`} aria-label={`Delete chat ${t.title}`} onClick={() => setDeletion(t)}><Trash2 /></Button>
+                </div>
               ))}
             </div>
           </div>
@@ -282,17 +322,23 @@ function Workspace({ thread }: { thread: NinjaThread | null }) {
               <img className="circuit-floor" src={floor} alt="" width={1536} height={1024} />
               {view !== "Home" ? (
                 <div className="utility-view">
-                  <h2>{view.toUpperCase()}</h2>
+                  <div className="utility-heading">
+                    <h2>{view.toUpperCase()}</h2>
+                    {(view === "History" || view === "Projects") && <Button variant="ghost" size="icon-sm" className="delete-chat" title="Clear all history" aria-label="Clear all history" disabled={!threads.length} onClick={() => setDeletion("all")}><Trash2 /></Button>}
+                  </div>
                   {view === "History" || view === "Projects" ? (
                     <div className="history-list">
                       {threads.map((t) => (
-                        <Button asChild variant="ninja" key={t.id}>
-                          <Link to="/chat/$threadId" params={{ threadId: t.id }}>
+                        <div className="history-item" key={t.id}>
+                        <Button asChild variant="ninja">
+                          <Link to="/chat/$threadId" params={{ threadId: t.id }} onClick={() => setView("Home")}>
                             <MessagesSquare />
-                            {t.title}
+                            <span>{t.title}</span>
                             <small>{t.messages.length} messages</small>
                           </Link>
                         </Button>
+                        <Button variant="ghost" size="icon-sm" className="delete-chat" title={`Delete ${t.title}`} aria-label={`Delete chat ${t.title}`} onClick={() => setDeletion(t)}><Trash2 /></Button>
+                        </div>
                       ))}
                     </div>
                   ) : view === "Settings" ? (
@@ -598,6 +644,20 @@ function Workspace({ thread }: { thread: NinjaThread | null }) {
         <div className="footer-circuit" />
         <span>SECURE // FAST // POWERFUL</span>
       </footer>
+      <AlertDialog open={deletion !== null} onOpenChange={(open) => { if (!open) setDeletion(null); }}>
+        <AlertDialogContent className="delete-dialog">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{deletion === "all" ? "Clear all chat history?" : "Delete this chat?"}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deletion === "all" ? "All conversations saved in this browser will be permanently deleted." : `“${deletion?.title || "This chat"}” and its messages will be permanently deleted.`} This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel asChild><Button variant="ninja">Cancel</Button></AlertDialogCancel>
+            <AlertDialogAction asChild onClick={confirmDeletion}><Button variant="destructive"><Trash2 />{deletion === "all" ? "Delete all chats" : "Delete chat"}</Button></AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

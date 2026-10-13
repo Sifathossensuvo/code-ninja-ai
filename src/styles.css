@@ -56,6 +56,7 @@
     oklch(0.15 0.044 170 / 0.4)
   );
   --scanline: oklch(0.02 0 0 / 0.12);
+  --overlay: oklch(0.025 0.01 175 / 0.8);
   --radius: 6px;
 }
 @layer base {
@@ -83,7 +84,7 @@
 }
 .ninja-app {
   height: 100dvh;
-  min-height: 680px;
+  min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -131,7 +132,7 @@
   align-items: center;
   gap: 12px;
   flex: 1;
-  min-width: 340px;
+  min-width: 0;
 }
 .brand-mark {
   width: 48px;
@@ -231,6 +232,7 @@
   min-height: 0;
   display: grid;
   grid-template-columns: 252px minmax(0, 1fr) 280px;
+  overflow: auto;
   gap: 18px;
   padding: 16px 15px 16px 0;
 }
@@ -299,8 +301,7 @@
   margin-top: 14px;
   padding: 17px 13px 0 18px;
   flex: 1;
-  min-height: 65px;
-  overflow: hidden;
+  min-height: 100px;
 }
 .active-sessions h3,
 .system-panel h3 {
@@ -476,17 +477,18 @@
 .welcome-content {
   position: relative;
   display: grid;
-  grid-template-columns: 1.12fr 1fr;
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
   gap: 20px;
   padding: 19px 19px;
-  height: 100%;
+  min-height: 100%;
+  overflow: auto;
 }
 .terminal-text {
   font-family: var(--font-mono);
   font-size: 11px;
   line-height: 1.55;
   color: var(--bright);
-  white-space: nowrap;
+  white-space: normal;
 }
 .terminal-text p {
   margin: 0;
@@ -849,8 +851,7 @@
   height: 100%;
 }
 .ninja-conversation > div {
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
+  scrollbar-width: none;
 }
 .ninja-conversation [data-streamdown] {
   font-size: 13px;
@@ -1297,7 +1298,7 @@
 }
 @media (max-width: 700px) {
   .ninja-app {
-    min-height: 580px;
+    min-height: 0;
   }
   .topbar {
     padding: 8px 12px;
@@ -1389,9 +1390,6 @@
   .composer-actions button {
     font-size: 9px;
     padding: 0 6px;
-  }
-  .composer-actions button:nth-child(n + 3) {
-    display: none;
   }
   .bottom-bar {
     padding: 0 12px;
@@ -1530,7 +1528,7 @@
     bottom: 5px;
   }
   .welcome-content {
-    grid-template-columns: 1.16fr 1fr;
+    grid-template-columns: minmax(0, 1.16fr) minmax(0, 1fr);
   }
   .welcome-mark {
     width: 122px;
@@ -1552,7 +1550,7 @@
 }
 @media (min-width: 941px) and (max-width: 1250px) {
   .system-panel:nth-child(4) {
-    overflow: hidden;
+    overflow: auto;
   }
   .system-panel:nth-child(4) h3 {
     margin-bottom: 5px;
@@ -1571,5 +1569,311 @@
   }
   .ninja-welcome h2 {
     margin-top: 0;
+  }
+}
+
+/* Keep every region reachable, including compact windows and touch screens. */
+html,
+body,
+.ninja-app *,
+.delete-dialog {
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.ninja-app *::-webkit-scrollbar,
+.delete-dialog::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+.topbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto auto auto auto;
+}
+.brand > div,
+.sidebar,
+.right-panels,
+.welcome-content > *,
+.ninja-conversation [data-streamdown],
+.ninja-conversation .group {
+  min-width: 0;
+}
+.brand-mark,
+.sidebar nav,
+.sidebar-bottom,
+.system-panel,
+.workspace-tab,
+.composer-tabs button,
+.composer-actions button {
+  flex-shrink: 0;
+}
+.brand h1,
+.brand p {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+.sidebar,
+.right-panels {
+  overflow-y: auto;
+}
+.active-sessions {
+  flex: 1 0 100px;
+}
+.main-workspace {
+  min-height: 360px;
+}
+.terminal-panel {
+  display: flex;
+  flex-direction: column;
+}
+.workspace-tabs,
+.composer-tabs {
+  flex-shrink: 0;
+  overflow-x: auto;
+  min-width: 0;
+}
+.terminal-body {
+  height: auto;
+  flex: 1;
+  min-height: 0;
+}
+.welcome-content {
+  height: 100%;
+}
+.terminal-text,
+.terminal-prompt,
+.ninja-tagline,
+.ninja-welcome h2,
+.output-view pre {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.ninja-welcome h2 {
+  font-size: 22px;
+}
+.command-list {
+  padding-left: 0;
+}
+.command-list > div {
+  grid-template-columns: 78px minmax(0, 1fr);
+}
+.status-box p {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+.status-box p span {
+  white-space: normal;
+}
+.composer-actions {
+  min-width: 0;
+  overflow-x: auto;
+  margin-left: 0;
+}
+.ninja-composer [data-align="block-end"] {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+.ninja-conversation {
+  min-height: 0;
+  min-width: 0;
+}
+.ninja-conversation [data-streamdown] {
+  overflow-wrap: anywhere;
+}
+.ninja-conversation pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.sessions-heading,
+.utility-heading,
+.session-item,
+.history-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.sessions-heading h3 {
+  margin: 0;
+}
+.sessions-heading {
+  margin-bottom: 8px;
+}
+.utility-heading {
+  margin-bottom: 20px;
+}
+.utility-heading h2 {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.session-row {
+  min-width: 0;
+  gap: 7px;
+}
+.session-row span,
+.history-item a span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.session-row small,
+.history-item small {
+  flex-shrink: 0;
+}
+.delete-chat {
+  color: var(--muted-foreground);
+}
+.delete-chat:hover {
+  color: var(--destructive);
+}
+.history-item a {
+  min-width: 0;
+  gap: 8px;
+}
+.history-item small {
+  font-size: 10px;
+}
+.delete-dialog {
+  width: calc(100% - 32px);
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  border-radius: 6px;
+  overflow-wrap: anywhere;
+}
+.sidebar-backdrop {
+  display: none;
+}
+.editor-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+.editor-toolbar > span,
+.editor-lines textarea {
+  min-width: 0;
+}
+.editor-toolbar > span {
+  overflow-wrap: anywhere;
+}
+.editor-lines {
+  overflow: auto;
+}
+.settings-content p {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  overflow-wrap: anywhere;
+}
+.output-view pre {
+  white-space: pre-wrap;
+}
+@media (max-width: 1080px) {
+  .topbar {
+    grid-template-columns: minmax(0, 1fr) auto auto auto auto;
+  }
+}
+@media (max-width: 940px) {
+  .workspace-layout {
+    grid-template-columns: 190px minmax(0, 1fr);
+    align-content: start;
+    grid-template-rows: minmax(360px, calc(100dvh - 127px)) auto;
+  }
+  .right-panels {
+    display: grid;
+    grid-column: 2;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+  }
+  .sidebar {
+    grid-row: 1 / span 2;
+    max-height: calc(100dvh - 127px);
+    position: sticky;
+    top: 0;
+  }
+  .quote-panel {
+    grid-column: 1 / -1;
+  }
+  .engine-status {
+    display: none;
+  }
+  .topbar {
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+  }
+  .welcome-content {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ninja-welcome {
+    padding-top: 20px;
+  }
+}
+@media (max-width: 700px) {
+  .topbar {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .workspace-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(360px, calc(100dvh - 128px)) auto;
+    gap: 12px;
+  }
+  .right-panels {
+    grid-column: 1;
+  }
+  .sidebar-open {
+    position: fixed;
+    top: 64px;
+    bottom: 40px;
+    max-height: none;
+    width: min(280px, calc(100% - 40px));
+  }
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 64px 0 40px;
+    background: var(--overlay);
+    z-index: 14;
+  }
+  .ninja-welcome {
+    display: block;
+  }
+  .brand h1 {
+    font-size: 17px;
+  }
+  .brand p {
+    line-height: 1.6;
+  }
+  .welcome-content {
+    padding: 16px;
+  }
+  .history-item a {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 45px;
+    white-space: normal;
+    padding-block: 8px;
+  }
+  .history-item a span {
+    flex: 1;
+    overflow-wrap: anywhere;
+  }
+}
+@media (max-width: 380px) {
+  .workspace-layout {
+    padding: 8px;
+    grid-template-rows: minmax(360px, calc(100dvh - 120px)) auto;
+  }
+  .right-panels {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .brand h1 {
+    font-size: 15px;
+  }
+  .brand-mark {
+    width: 28px;
+  }
+  .composer-panel {
+    padding-inline: 8px;
+  }
+  .bottom-bar {
+    gap: 8px;
   }
 }
