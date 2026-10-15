@@ -40,7 +40,9 @@ describe("Browser-saved conversations", () => {
   it("does not restore a deleted chat when a pending reply finishes", () => {
     createThread("first");
     deleteThread("first");
-    saveMessages("first", [{ id: "late", role: "assistant", parts: [{ type: "text", text: "Late reply" }] }]);
+    saveMessages("first", [
+      { id: "late", role: "assistant", parts: [{ type: "text", text: "Late reply" }] },
+    ]);
     expect(readThreads()).toEqual([]);
   });
 });
