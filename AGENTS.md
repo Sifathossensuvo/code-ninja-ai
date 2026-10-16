@@ -11,6 +11,8 @@
 
 - Chat page IDs come from `/chat/$threadId`; browser-local thread records store complete AI SDK UIMessage parts to preserve conversation separation and history.
 - The AI streaming boundary is `/api/chat`, with provider configuration in server-only modules; no chat history is stored in Cloud.
+- OpenRouter credentials are read from server-only OPENROUTER_API_KEY inside the chat handler; model identity is shared from a browser-safe module so all labels match the requested model without exposing keys.
+- Replay text-only conversation history to OpenRouter, retaining complete UI parts in browser storage; this prevents incompatible encrypted reasoning from the former provider being sent upstream.
 - Use AI Elements for the transcript, markdown, loading state and composer, with visual roles defined in the global design system.
 - Thread deletion uses browser-storage helpers; missing or deleted thread URLs redirect to an existing or fresh session rather than recreating a deleted ID.
 - Workspace overflow is handled by bounded scrolling regions; narrow screens retain system panels below the primary workspace and navigation in a scrollable drawer.

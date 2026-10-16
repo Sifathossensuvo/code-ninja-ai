@@ -62,6 +62,7 @@ import {
   type NinjaThread,
 } from "@/lib/threads";
 import floor from "@/assets/circuit-floor.jpg";
+import { CHAT_MODEL } from "@/lib/ai-model";
 const commands = [
   ["/chat", "Start a new conversation"],
   ["/code", "Generate code"],
@@ -224,7 +225,7 @@ function Workspace({ thread }: { thread: NinjaThread | null }) {
           <i /> AI ENGINE: ONLINE <span>✦</span>
         </div>
         <div className="header-model">
-          Model: GPT-6 Astra <ChevronDown size={13} />
+          Model: {CHAT_MODEL.label} <ChevronDown size={13} />
         </div>
         <div className="header-stats">
           <span>CPU 12%</span>
@@ -414,7 +415,7 @@ function Workspace({ thread }: { thread: NinjaThread | null }) {
                     <div className="settings-content">
                       <h3>WORKSPACE CONFIGURATION</h3>
                       <p>
-                        AI MODEL <strong>GPT-6 Astra</strong>
+                        AI MODEL <strong>{CHAT_MODEL.label}</strong>
                       </p>
                       <p>
                         CONVERSATIONS <strong>Saved in this browser</strong>

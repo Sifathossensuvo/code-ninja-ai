@@ -30,19 +30,26 @@ export const Route = createFileRoute("/api/chat")({
           const parsed = schema.safeParse(JSON.parse(raw));
           if (!parsed.success)
             return Response.json({ error: "Invalid conversation." }, { status: 400 });
-          const apiKey = process.env["LOVABLE_API_KEY"];
+          const apiKey = process.env["OPENROUTER_API_KEY"];
           if (!apiKey)
-            return Response.json({ error: "AI is not configured yet." }, { status: 401 });
-          const { createResponsesCall } = await import("@/lib/server/responses");
-          const { withLovableAiGatewayRunIdHeader } = await import("@/lib/server/run-id");
+            return Response.json(
+              { error: "OpenRouter is not configured. Add OPENROUTER_API_KEY in your hosting environment settings and redeploy." },
+              { status: 401 },
+            );
+          const { createOpenRouterCall } = await import("@/lib/server/openrouter");
           const messages = parsed.data.messages as UIMessage[];
-          const { result, runIdFetch } = createResponsesCall(
+          const result = createOpenRouterCall(
             request,
-            { baseURL: "https://ai.gateway.lovable.dev/v1", apiKey, model: "openai/gpt-6-astra" },
-            await convertToModelMessages(messages),
+            apiKey,
+            await convertToModelMessages(
+              messages.map((message) => ({
+                ...message,
+                // OpenRouter cannot replay encrypted reasoning from the previous provider.
+                parts: message.parts.filter((part) => part.type === "text"),
+              })),
+            ),
             "You are The Code Ninja, a friendly expert coding assistant. Help generate, explain, fix and optimize code. Be concise, practical, and use markdown with fenced code blocks. Never pretend to run code, search the web, or create files. Your user works in a neon hacker terminal.",
           );
-          // The SDK maintains full message parts, including encrypted reasoning metadata.
           const response = result.toUIMessageStreamResponse({
             originalMessages: messages,
             sendReasoning: true,
@@ -57,7 +64,7 @@ export const Route = createFileRoute("/api/chat")({
               }
             },
           });
-          return withLovableAiGatewayRunIdHeader(response, runIdFetch);
+          return response;
         } catch (error) {
           if (request.signal.aborted) return new Response(null, { status: 499 });
           return Response.json(
