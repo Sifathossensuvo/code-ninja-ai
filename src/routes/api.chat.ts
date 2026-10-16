@@ -33,7 +33,10 @@ export const Route = createFileRoute("/api/chat")({
           const apiKey = process.env["OPENROUTER_API_KEY"];
           if (!apiKey)
             return Response.json(
-              { error: "OpenRouter is not configured. Add OPENROUTER_API_KEY in your hosting environment settings and redeploy." },
+              {
+                error:
+                  "OpenRouter is not configured. Add OPENROUTER_API_KEY in your hosting environment settings and redeploy.",
+              },
               { status: 401 },
             );
           const { createOpenRouterCall } = await import("@/lib/server/openrouter");

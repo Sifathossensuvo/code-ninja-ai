@@ -24,8 +24,8 @@ describe("OpenRouter chat", () => {
       ]);
       return new Response(
         'data: {"id":"test","object":"chat.completion.chunk","created":0,"model":"cohere/north-mini-code:free","choices":[{"index":0,"delta":{"role":"assistant","content":"Emerald"},"finish_reason":null}]}\n\n' +
-        'data: {"id":"test","object":"chat.completion.chunk","created":0,"model":"cohere/north-mini-code:free","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}\n\n' +
-        'data: [DONE]\n\n',
+          'data: {"id":"test","object":"chat.completion.chunk","created":0,"model":"cohere/north-mini-code:free","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}\n\n' +
+          "data: [DONE]\n\n",
         { headers: { "Content-Type": "text/event-stream" } },
       );
     });
@@ -42,6 +42,8 @@ describe("OpenRouter chat", () => {
     );
     expect(await result.text).toBe("Emerald");
     expect(fetchMock).toHaveBeenCalledOnce();
-    expect(String(fetchMock.mock.calls[0]?.[0])).toBe("https://openrouter.ai/api/v1/chat/completions");
+    expect(String(fetchMock.mock.calls[0]?.[0])).toBe(
+      "https://openrouter.ai/api/v1/chat/completions",
+    );
   });
 });
