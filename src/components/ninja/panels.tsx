@@ -9,6 +9,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CHAT_MODEL } from "@/lib/ai-model";
 export const actions = [
   { label: "Generate Code", icon: Braces, prompt: "/code " },
   { label: "Explain Code", icon: ChartNoAxesCombined, prompt: "/explain " },
@@ -94,8 +95,8 @@ export function RightPanels({
       </section>
       <section className="system-panel">
         <h3>ACTIVE MODEL</h3>
-        <div className="model-readout" title="Powered by GPT-6 Astra">
-          GPT-6 Astra <ChevronDown size={12} />
+        <div className="model-readout" title={`OpenRouter · ${CHAT_MODEL.id}`}>
+          {CHAT_MODEL.label} <ChevronDown size={12} />
         </div>
         <div className="ready">
           <i /> Ready
