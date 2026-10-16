@@ -8,3 +8,5 @@
 - [x] Switch chat to an available fast, free OpenRouter model and update model labels.
 - [x] Provide secure key setup instructions for shared use and Vercel.
 - [x] Verify streaming and conversation history with OpenRouter using the saved API key.
+- [x] Remove the Lovable site icon and Lovable social handle from the page head.
+- [ ] Push the code to GitHub. (Blocked: needs the user to connect a repository in Project settings → Git.)
